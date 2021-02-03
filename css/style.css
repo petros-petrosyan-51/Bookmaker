@@ -2,9 +2,6 @@
     margin: 0;
     padding: 0;
 }
-.novibet{
-    display: none;
-}
 #novibet{
     margin-top: 10px;
 }
@@ -30,4 +27,7 @@
 }
 .time{
     font-size: 10px;
+}
+#hidden{
+    display: none;
 }
