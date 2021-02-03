@@ -1,0 +1,33 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+.novibet{
+    display: none;
+}
+#novibet{
+    margin-top: 10px;
+}
+.container {
+    max-width: 70%;
+    margin: auto;
+  }
+.form{
+    display: flex;
+}
+.search{
+    margin-top: 10px;
+    width: 100%;
+}
+.result{
+    margin-top: 10px;
+    width: 100%;
+}
+.main{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2%;
+}
+.time{
+    font-size: 10px;
+}
