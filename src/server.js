@@ -4,8 +4,37 @@ const axios = require('axios')
 const app = express();
 const port = 3000;
 const dirname = path.resolve();
+let array = [];
+let result = [];
 function search(data,param){
     return data.Competitor1.toLowerCase().includes(param.toLowerCase()) || data.Competitor2.toLowerCase().includes(param.toLowerCase())
+}
+function getItem(data,param){
+  array=[];  
+  data = data.data[0].BetViews.map(({Competitions})=>Competitions.map(({Events})=>{
+        return Events.filter(({AdditionalCaptions})=>{
+            return search(AdditionalCaptions,param)
+        })
+    }))
+    for (let i=0;i<data.length;i++){
+        if(data[i].length !==0){
+            for (let j=0;j<data[i].length;j++){
+                 if(data[i][j].length !==0){
+                    array.push(data[i][j])
+                 }
+            }
+        }
+    }
+    return array;
+}
+function pushItem(data){
+    for (let i=0;i<data.length;i++){
+        for (let j=0;j<data[i].length;j++){
+           if (!result.some(item => item.BetContextId ===data[i][j].BetContextId )){
+               result.push(data[i][j])
+           }
+        }
+    }
 }
 app.get('/',(_, res) => {
  res.sendFile(path.join(dirname+'/index.html'));
@@ -19,31 +48,34 @@ app.get('/js/jquery-3.5.1.min.js',function(_,res){
 app.get('/css/style.css',function(_,res){
     res.sendFile(path.join(dirname + '/css/style.css')); 
 });
-app.post('/:search',async (req,res)=>{
-    try{
-        let LiveSchedule = await axios.get('https://www.novibet.com/api/marketviews/location/16/450145?lang=en-US&oddsR=1&timeZ=Romance%20Standard%20Time&usrGrp=null&timestamp='+new Date().getTime());
-        let LiveNow = await axios.get('https://www.novibet.com/api/marketviews/location/16/450144?lang=en-US&oddsR=1&timeZ=Romance%20Standard%20Time&usrGrp=null&timestamp='+new Date().getTime());
-        LiveSchedule = LiveSchedule.data[0].BetViews.map(({Events})=>{ 
-            return Events.filter(({AdditionalCaptions})=>{
-                return search(AdditionalCaptions,req.params.search)
-            })
-          })
-        LiveNow  =  LiveNow.data[0].BetViews.map(({Competitions})=>{
-            return Competitions.map(({Events})=>{
-                 return Events.filter(({AdditionalCaptions})=>{
-                    return search(AdditionalCaptions,req.params.search)
-                 })
-             })
-         })
-         LiveSchedule = LiveSchedule.reduce(function(a, b) { return a.concat(b)});
-         LiveNow = LiveNow.reduce(function(a, b) {return a.concat(b)});
-         if (LiveNow[0].length == 0){
-             LiveNow = []
-         }
-               res.json({
-             "LiveSchedule": LiveSchedule,
-             "LiveNow": LiveNow
-         })
+app.post('/:search/:time',async (req,res)=>{
+    try{ 
+       const param = req.params.search
+       let LiveNow = await axios.get('https://www.novibet.com/api/marketviews/location/16/450144?lang=en-US&oddsR=1&timeZ=Romance%20Standard%20Time&usrGrp=null&timestamp='+req.params.time);
+       let params = '';
+       result=[]
+        if (param.length > 1){
+          pushItem(getItem(LiveNow,param))  
+          for (let i = 0;i<param.length;i++){
+              if (param.length-1 !== i){
+                params=''
+                for (let k=i+1;k<param.length;k++){
+                    params = params +param[k]
+               } 
+              if (params.length > 1){
+                pushItem(getItem(LiveNow,params))  
+              }
+             }          
+           }
+        }else{
+            pushItem(getItem(LiveNow,param))  
+        }
+        if (result[0]){
+            result[0].type=result[0].Path.split('/')[0].toLowerCase();
+            res.json(result[0])
+        }else{
+            res.json({"error":[]})
+        }
     }catch(err){
         res.json({"error": err})
     }
