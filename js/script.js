@@ -18,10 +18,16 @@ function appendResult(data){
  data.text = ''
  $(".result").empty();
  if (data.Markets.length !== 0){
-  for (let i =0;i<data.Markets[0].BetItems.length;i++){
-    data.text = data.text + " " + "P"+parseInt(i+1)+" - "+data.Markets[0].BetItems[i].OddsText
-  }
-  $(".result").append('<div class="main"><div><p>'+data.name+'</p><p>'+data.text+'</p></div><a href="'+data.Path+'">Link</a></div>')
+     if (parseInt(data.Markets[0].BetItems[0].Caption)){
+         for (let i =0;i<data.Markets[0].BetItems.length;i++){
+             data.text = data.text + " " + "P"+parseInt(i+1)+" - "+data.Markets[0].BetItems[i].OddsText
+         }
+     }else {
+         for (let i = 0;i<data.Markets[0].BetItems.length;i++){
+             data.text = data.text + " " + data.Markets[0].BetItems[i].Caption + " - "+data.Markets[0].BetItems[i].OddsText
+         }
+     }
+  $(".result").append('<div class="main"><div><p>'+data.name+'</p><p>'+data.text+'</p></div><a target="_blank" href="'+data.Path+'">Link</a></div>')
   copyToClipboard(url)
  }
 }
@@ -30,7 +36,7 @@ function events(){
       $(".result").empty();
       $(".result").append(' <div class="main">Loading...</div>');
         $.ajax({
-            url: window.location.pathname+$(".search").val()+"/"+new Date().addHours(1).getTime(),
+            url: window.location.pathname+$(".search").val()+"/"+new Date().getTime(),
             method: "POST",
             success: function(data){
                if (data.error){
