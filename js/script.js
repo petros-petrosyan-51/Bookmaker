@@ -9,9 +9,8 @@ function copyToClipboard(text) {
   document.execCommand("copy");
   $temp.remove();
 }
-function appendResult(data){  
-  
-  const url =  "https://www.novibet.com/live-betting?event="+data.BetContextId
+function appendResult(data){
+    const url =  "https://www.novibet.com/live-betting?event="+data.BetContextId
  data.Path = "htps://www.novibet.com/live-betting?event="+data.BetContextId
  data.name = data.AdditionalCaptions.Competitor1
  data.name = data.name + " - "+data.AdditionalCaptions.Competitor2
@@ -27,9 +26,11 @@ function appendResult(data){
              data.text = data.text + " " + data.Markets[0].BetItems[i].Caption + " - "+data.Markets[0].BetItems[i].OddsText
          }
      }
-  $(".result").append('<div class="main"><div><p>'+data.name+'</p><p>'+data.text+'</p></div><a target="_blank" href="'+data.Path+'">Link</a></div>')
-  copyToClipboard(url)
+ }else {
+     data.text = "About to Start"
  }
+    $(".result").append('<div class="main"><div><p>'+data.name+'</p><p>'+data.text+'</p></div><a target="_blank" href="'+data.Path+'">Link</a></div>')
+    copyToClipboard(url)
 }
 function events(){
     if ($(".search").val()){
@@ -38,6 +39,7 @@ function events(){
         $.ajax({
             url: window.location.pathname+$(".search").val()+"/"+new Date().getTime(),
             method: "POST",
+            cache: false,
             success: function(data){
                if (data.error){
                 $(".result").empty();
@@ -79,7 +81,4 @@ $( document ).ready(function(){
             events();
         }
     });
-   
-
-   
 });

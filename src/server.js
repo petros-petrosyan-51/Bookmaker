@@ -70,8 +70,16 @@ app.post('/:search/:time',async (req,res)=>{
         }else{
             pushItem(getItem(LiveNow,param))  
         }
-        if (result[0]){
-            result[0].type=result[0].Path.split('/')[0].toLowerCase();
+        if (result.length){
+            for (let i = 0;i<result.length;i++){
+                result[i].type=result[i].Path.split('/')[0].toLowerCase();
+            }
+            if (result.length > 1){
+                array = result.filter(({AdditionalCaptions})=>search(AdditionalCaptions,req.params.search));
+                if (array.length){
+                    result = array
+                }
+            }
             res.json(result[0])
         }else{
             res.json({"error":[]})
