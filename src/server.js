@@ -56,17 +56,19 @@ app.post('/:search/:time',async (req,res)=>{
        result=[]
         if (param.length > 1){
           pushItem(getItem(LiveNow,param))  
-          for (let i = 0;i<param.length;i++){
-              if (param.length-1 !== i){
-                params=''
-                for (let k=i+1;k<param.length;k++){
-                    params = params +param[k]
-               } 
-              if (params.length > 1){
-                pushItem(getItem(LiveNow,params))  
-              }
-             }          
-           }
+          if (!result.length){
+            for (let i = 0;i<param.length;i++){
+                if (param.length-1 !== i){
+                  params=''
+                  for (let k=i+1;k<param.length;k++){
+                      params = params +param[k]
+                 } 
+                if (params.length > 1){
+                  pushItem(getItem(LiveNow,params))  
+                }
+               }          
+             }
+          }
         }else{
             pushItem(getItem(LiveNow,param))  
         }
